@@ -1,0 +1,19 @@
+import socket
+import time
+
+def simulate_network_load(target_ip, target_port, duration, packet_size=1024):
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    data = b'A' * packet_size  # Datenpaket von gewünschter Größe
+    
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        client.sendto(data, (target_ip, target_port))
+        time.sleep(0.01)  # Kurze Pause zwischen den Sendungen, um eine Überlastung zu vermeiden
+    print("Netzwerkbelastungssimulation beendet.")
+
+# Beispielverwendung
+target_ip = "192.168.1.100"  # IP-Adresse des Zielcomputers (sollte in deinem Netzwerk sein)
+target_port = 12345  # Zielport (du kannst einen beliebigen unbenutzten Port wählen)
+duration = 10  # Dauer der Simulation in Sekunden
+
+simulate_network_load(target_ip, target_port, duration)

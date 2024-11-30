@@ -1,19 +1,42 @@
 import socket
 import time
 
-def simulate_network_load(target_ip, target_port, duration, packet_size=1024):
-    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    data = b'A' * packet_size  # Datenpaket von gewünschter Größe
+def simulate_network_load(target_ip, target_port, duration, packet_size=1024, interval=0.01):
+    """
+    Simuliert Netzwerkbelastung durch UDP-Pakete.
     
-    start_time = time.time()
-    while time.time() - start_time < duration:
-        client.sendto(data, (target_ip, target_port))
-        time.sleep(0.01)  # Kurze Pause zwischen den Sendungen, um eine Überlastung zu vermeiden
-    print("Netzwerkbelastungssimulation beendet.")
+    Args:
+        target_ip (str): Ziel-IP-Adresse
+        target_port (int): Zielport
+        duration (float): Dauer der Simulation in Sekunden
+        packet_size (int): Größe jedes Pakets in Bytes
+        interval (float): Wartezeit zwischen Paketen in Sekunden
+    """
+    try:
+        client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        data = b'A' * packet_size
+        packets_sent = 0
+        
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            try:
+                client.sendto(data, (target_ip, target_port))
+                packets_sent += 1
+                time.sleep(interval)
+            except socket.error as e:
+                print(f"Fehler beim Senden: {e}")
+                break
+                
+        print(f"Simulation beendet. {packets_sent} Pakete gesendet.")
+        
+    except Exception as e:
+        print(f"Ein Fehler ist aufgetreten: {e}")
+    finally:
+        client.close()
 
 # Beispielverwendung
-target_ip = "192.168.1.100"  # IP-Adresse des Zielcomputers (sollte in deinem Netzwerk sein)
-target_port = 12345  # Zielport (du kannst einen beliebigen unbenutzten Port wählen)
-duration = 10  # Dauer der Simulation in Sekunden
+target_ip = "127.0.0.1"  # Localhost für Tests
+target_port = 12345
+duration = 10
 
 simulate_network_load(target_ip, target_port, duration)
